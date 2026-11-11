@@ -1,10 +1,14 @@
 import streamlit as st
-from langdetect import detect, DetectorFactory
+from lingua import Language, LanguageDetectorBuilder
 
 # Configuração da página
 st.set_page_config(page_title="Separador de Traduções", layout="wide")
 
-DetectorFactory.seed = 0
+DETECTOR_IDIOMAS = LanguageDetectorBuilder.from_languages(
+    Language.PORTUGUESE,
+    Language.ENGLISH,
+    Language.SPANISH,
+).build()
 modo_escuro = st.session_state.get("modo_escuro", False)
 
 st.markdown(
@@ -287,7 +291,11 @@ if processar:
 
         ultima_chave = None
         proxima_posicao = 0
-        idiomas = [portugues, ingles, espanhol]
+        resultados_por_idioma = {
+            Language.PORTUGUESE: portugues,
+            Language.ENGLISH: ingles,
+            Language.SPANISH: espanhol,
+        }
         chaves_vistas = set()
 
         for linha in linhas_brutas:
@@ -304,28 +312,25 @@ if processar:
                     tags_unicas.append(f'"{chave}",')
                     chaves_vistas.add(chave)
 
-                try:
-                    idioma = detect(valor)
-                    linha_fmt = f"{chave}={valor}"
-                    if idioma == 'pt':
-                        portugues.append(linha_fmt)
-                    elif idioma == 'en':
-                        ingles.append(linha_fmt)
-                    elif idioma == 'es':
-                        espanhol.append(linha_fmt)
-                except:
-                    pass
-
             elif "." in linha and " " not in linha:
                 ultima_chave = linha
                 proxima_posicao = 0
                 if linha not in chaves_vistas:
                     tags_unicas.append(f'"{linha}",')
                     chaves_vistas.add(linha)
+                continue
 
-            elif ultima_chave and proxima_posicao < len(idiomas):
-                idiomas[proxima_posicao].append(f"{ultima_chave}={linha}")
+            elif ultima_chave and proxima_posicao < 3:
+                chave = ultima_chave
                 proxima_posicao += 1
+                valor = linha
+            else:
+                continue
+
+            idioma = DETECTOR_IDIOMAS.detect_language_of(valor)
+            destino = resultados_por_idioma.get(idioma)
+            if destino is not None:
+                destino.append(f"{chave}={valor}")
 
         st.success("Traduções separadas com sucesso!")
 

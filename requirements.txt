@@ -1,2 +1,2 @@
 streamlit
-langdetect
+lingua-language-detector

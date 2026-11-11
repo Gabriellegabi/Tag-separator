@@ -33,7 +33,7 @@ Depois de iniciar, abra o endereço local exibido pelo Streamlit, geralmente `ht
 
 ### Chave seguida das traduções
 
-Informe a chave em uma linha e, nas três linhas seguintes, as traduções nesta ordem: Português, Inglês e Espanhol. Linhas vazias são ignoradas.
+Informe a chave em uma linha e, nas três linhas seguintes, as traduções em qualquer ordem. O app tenta identificar o idioma de cada texto. Linhas vazias são ignoradas.
 
 ```text
 class.generic.label.exemplo
@@ -52,7 +52,7 @@ Também é possível informar pares `chave=valor`:
 class.generic.label.exemplo=Texto em Português
 ```
 
-Nesse formato, o idioma é identificado automaticamente. Como a detecção pode não ser precisa em valores curtos, prefira os blocos de três traduções quando souber a ordem dos idiomas.
+Nesse formato, o idioma também é identificado automaticamente. A detecção é feita pela biblioteca Lingua e pode falhar em palavras muito curtas ou ambíguas.
 
 ## Resultados
 
